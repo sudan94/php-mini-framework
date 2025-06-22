@@ -8,15 +8,18 @@ use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\validator as v;
 use App\Models\User;
 use App\Core\Session;
+use App\Core\FileLogger;
 
 class AuthController extends Controller
 {
     private User $userModel;
+    private FileLogger $fileLogger;
 
     public function __construct(PDO $db)
     {
         parent::__construct($db);
         $this->userModel = new User($db);
+        $this->fileLogger = new FileLogger();
     }
 
     public function registerPage(): void
@@ -54,6 +57,9 @@ class AuthController extends Controller
             $user = $this->userModel->findByEmail($data['email']);
             Session::login($user['id'], $user["email"], $user["name"]);
             Session::set('success', 'Welcome back, ' . $user['name']);
+             // add to login history
+            $this->fileLogger->log("INFO", "logged in with email: " . $data['email']);
+
             $this->redirect("/");
         } else {
             echo $this->render('auth/login.twig', [
@@ -104,6 +110,7 @@ class AuthController extends Controller
 
         if ($userId) {
             Session::set('success', 'Registration successful. Please log in.');
+            $this->fileLogger->log("INFO", "User registered with email: " . $data['email']);
             $this->redirect("/login");
         } else {
             echo $this->render('auth/register.twig', [

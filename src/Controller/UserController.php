@@ -8,32 +8,41 @@ use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\validator as v;
 use PDO;
 use App\Models\User;
+use App\Core\FileLogger;
+use App\Core\DatabaseLogger;
 
-class UserController extends Controller {
+class UserController extends Controller
+{
 
     private User $userModel;
-
+    private FileLogger $fileLogger;
+    private DatabaseLogger $dbLogger;
     public function __construct(PDO $db)
     {
         parent::__construct();
         $this->userModel = new User($db);
+        $this->fileLogger = new FileLogger();
+        $this->dbLogger = new DatabaseLogger($db);
     }
 
-    public function profilePage() : void{
-        echo $this->render('users/profile.twig',[
+    public function profilePage(): void
+    {
+        echo $this->render('users/profile.twig', [
             "user" => Session::user()
         ]);
     }
 
-    public function editProfilePage() : void {
-        echo $this->render('users/editProfile.twig',[
+    public function editProfilePage(): void
+    {
+        echo $this->render('users/editProfile.twig', [
             "user" => Session::user(),
             'csrf_token' => $this->generateCsrfToken()
         ]);
     }
 
-    public function updateUser() : void {
-         $data = [
+    public function updateUser(): void
+    {
+        $data = [
             'name' => filter_input(INPUT_POST, 'name'),
             'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL)
         ];
@@ -51,7 +60,7 @@ class UserController extends Controller {
             ]);
         }
 
-         $row = $this->userModel->UpdateUser($data);
+        $row = $this->userModel->UpdateUser($data);
 
         if ($row) {
             Session::set('success', 'User data updated sucessfully');
@@ -66,8 +75,9 @@ class UserController extends Controller {
         }
     }
 
-    public function deleteUser(){
-          $row = $this->userModel->deleteUser();
+    public function deleteUser()
+    {
+        $row = $this->userModel->deleteUser();
         if ($row) {
             Session::set('success', 'User removed sucessfully');
             Session::logout();

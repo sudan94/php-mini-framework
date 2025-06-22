@@ -16,7 +16,7 @@ abstract class Controller
     {
         $loader = new FilesystemLoader(__DIR__ . '/../Views');
         $this->twig = new Environment($loader, [
-            'cache' => $_ENV['APP_ENV'] === 'production' ? __DIR__ . '/../../cache' : false,
+            // 'cache' => $_ENV['APP_ENV'] === 'production' ? __DIR__ . '/../../cache' : false,
             'debug' => $_ENV['APP_DEBUG'] ?? false,
         ]);
 
@@ -26,7 +26,6 @@ abstract class Controller
             return Session::flash($key);
         }));
     }
-
     protected function render(string $view, array $data = []): string
     {
         return $this->twig->render($view, $data);
