@@ -1,0 +1,27 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Home - Technical Challenge{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">{{ users.name }}</h1>
+                <p class="card-text">
+                    This is a modern PHP web application built for the Junior Web Developer technical challenge.
+                    It demonstrates the following features:
+                </p>
+                <ul>
+                    <li>Modern PHP 8.1+ features</li>
+                    <li>MVC Architecture</li>
+                    <li>Secure authentication system</li>
+                    <li>Form validation and CSRF protection</li>
+                    <li>Database operations with PDO</li>
+                    <li>Clean and responsive UI with Bootstrap</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
