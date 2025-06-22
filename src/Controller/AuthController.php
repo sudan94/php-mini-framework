@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Core\Controller;
 use PDO;
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\validator as v;
 use App\Models\User;
 use App\Core\Session;
@@ -35,25 +36,31 @@ class AuthController extends Controller
             'password' => $_POST['password'] ?? ''
         ];
 
-        // Validate input using Respect/Validation
-        $validator = v::key('email', v::email()->notEmpty())
-            ->key('password', v::stringType()->notEmpty());
+        $validator = v::attribute('email', v::email()->notEmpty())
+            ->attribute('password', v::stringType()->notEmpty());
 
         try {
-            $validator->assert($data);
-        } catch (\Respect\Validation\Exceptions\ValidationException $e) {
-             Session::set('error', 'Invalid credentials');
-            $this->redirect("/login");
+            $validator->assert((object)$data);
+        } catch (NestedValidationException $e) {
+            echo $this->render('auth/login.twig', [
+                'errors' => $this->getValidationErrors($e),
+                'old' => $data,
+                'csrf_token' => $this->generateCsrfToken()
+            ]);
+            return;
         }
 
         if ($this->verifyPassword($data['email'], $data['password'])) {
             $user = $this->userModel->findByEmail($data['email']);
-            Session::login($user['id'], $data["email"]);
+            Session::login($user['id'], $user["email"], $user["name"]);
             Session::set('success', 'Welcome back, ' . $user['name']);
             $this->redirect("/");
         } else {
-            Session::set('error', 'Invalid credentials');
-            $this->redirect("/login");
+            echo $this->render('auth/login.twig', [
+                'errors' => ['general' => 'Invalid credentials'],
+                'old' => $data,
+                'csrf_token' => $this->generateCsrfToken()
+            ]);
         }
     }
 
@@ -62,38 +69,48 @@ class AuthController extends Controller
     {
 
         $data = [
+            'name' => filter_input(INPUT_POST, 'name'),
             'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
             'password' => $_POST['password'] ?? '',
-            'name' => filter_input(INPUT_POST, 'name')
+            'confirm_password' => $_POST['confirm_password'] ?? ''
         ];
 
-        // validation using Respect/validation
-        $validator = v::key('email', v::email()->notEmpty())
-            ->key('password', v::stringType()->length(6, null)->notEmpty())
-            ->key('confirm_password', V::equals('password'))
-            ->key('name', v::stringType()->notEmpty()
-        );
+        $validator = v::attribute('name', v::stringType()->notEmpty())
+            ->attribute('email', v::email()->notEmpty())
+            ->attribute('password', v::stringType()->length(6, null)->notEmpty())
+            ->attribute('confirm_password', v::equals($data['password']));
 
         try {
-            $validator->assert($data);
-        } catch (\Respect\Validation\Exceptions\ValidationException $e) {
-            Session::set('error', $e->getMessage());
-           $this->redirect("/register");
+            $validator->assert((object)$data);
+        } catch (NestedValidationException $e) {
+            echo $this->render('auth/register.twig', [
+                'errors' => $this->getValidationErrors($e),
+                'old' => $data,
+                'csrf_token' => $this->generateCsrfToken()
+            ]);
+            return;
         }
 
         if ($this->userModel->findByEmail($data['email'])) {
-            Session::set('error', 'Email already registered');
-           $this->redirect("/register");
+            echo $this->render('auth/register.twig', [
+                'errors' => ['email' => 'Email already registered'],
+                'old' => $data,
+                'csrf_token' => $this->generateCsrfToken()
+            ]);
+            return;
         }
 
         $userId = $this->userModel->createUser($data);
 
         if ($userId) {
-            Session::set('success', 'Registration successfull');
+            Session::set('success', 'Registration successful. Please log in.');
             $this->redirect("/login");
         } else {
-            Session::set('error', 'Registration Failed');
-            $this->redirect("/register");
+            echo $this->render('auth/register.twig', [
+                'errors' => ['general' => 'Registration Failed'],
+                'old' => $data,
+                'csrf_token' => $this->generateCsrfToken()
+            ]);
         }
     }
 
@@ -113,4 +130,6 @@ class AuthController extends Controller
         Session::logout();
         $this->redirect("/login");
     }
+
+
 }

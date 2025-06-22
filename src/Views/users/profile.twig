@@ -1,0 +1,45 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Home - Technical Challenge
+{% endblock %}
+
+{% block content %}
+	<div class="row ">
+		<div class="col-6 offset-3">
+			<div class="card">
+				<div class="card-body">
+					<p class="card-text">
+						<label>Name:</label>
+						{{ user.user_name }}<br>
+						<label>Email:</label>
+						{{ user.user_email }}<br></p>
+				</div>
+                <div class="card-footer">
+					<a href="/users/edit" class="btn btn-primary">Edit Profile</a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteProfileModal">Delete Profile</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal" id="deleteProfileModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form action="/users/delete" method="post" novalidate>
+					<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Profile</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>Are you sure you want to delete your profile?</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Delete</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}

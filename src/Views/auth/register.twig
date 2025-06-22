@@ -1,34 +1,50 @@
-{% extends "layouts/base.twig" %}
+{% extends 'layouts/base.twig' %}
 
 {% block title %}Home - Technical Challenge{% endblock %}
 
 {% block content %}
-<form action="{{ action }}" method="POST">
-<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-<div class="row">
-    <div class="mb-3 col-md-6">
-        <label for="name" class="form-label">Name</label>
-        <input type="text" class="form-control" id="name" name="name" aria-describedby="emailHelp">
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title text-center">Register</h1>
+                {% if errors.general %}
+                    <div class="alert alert-danger">{{ errors.general }}</div>
+                {% endif %}
+                <form action="/register" method="post" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control {{ errors.name ? 'is-invalid' : '' }}" id="name" name="name" value="{{ old.name ?? '' }}" required>
+                        {% if errors.name %}
+                            <div class="invalid-feedback">{{ errors.name }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control {{ errors.email ? 'is-invalid' : '' }}" id="email" name="email" value="{{ old.email ?? '' }}" required>
+                        {% if errors.email %}
+                            <div class="invalid-feedback">{{ errors.email }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control {{ errors.password ? 'is-invalid' : '' }}" id="password" name="password" required>
+                        {% if errors.password %}
+                            <div class="invalid-feedback">{{ errors.password }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control {{ errors.confirm_password ? 'is-invalid' : '' }}" id="confirm_password" name="confirm_password" required>
+                        {% if errors.confirm_password %}
+                            <div class="invalid-feedback">{{ errors.confirm_password }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+            </div>
+        </div>
     </div>
-  <div class="mb-3 col-md-6">
-    <label for="exampleInputEmail1" class="form-label">Email address</label>
-    <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-  </div>
-    </div>
-<div class="row">
-  <div class="mb-3 col-md-6">
-    <label for="exampleInputPassword1" class="form-label">Password</label>
-    <input type="password" name="password" class="form-control" id="exampleInputPassword1">
-  </div>
-   <div class="mb-3 col-md-6">
-    <label for="exampleInputPassword1" class="form-label">Conform Password</label>
-    <input type="password" name="conform_password" class="form-control" id="exampleInputPassword1">
-  </div>
-  </div>
-  <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</div>
 {% endblock %}

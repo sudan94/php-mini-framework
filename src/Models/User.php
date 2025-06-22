@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Model;
+use App\Core\Session;
 use PDO;
 
 class User extends Model
@@ -21,6 +22,7 @@ class User extends Model
 
     public function createUser(array $data): int
     {
+        unset($data["confirm_password"]);
         $data["password"] = password_hash($data["password"], PASSWORD_DEFAULT);
 
         $data["created_at"] = date("y-m-d H:i:s");
@@ -28,5 +30,17 @@ class User extends Model
         $stmt = $this->db->prepare("INSERT INTO {$this->table} SET name = :name, email = :email, password = :password, created_at = :created_at");
         $stmt->execute($data);
         return (int)$this->db->lastInsertId();
+    }
+
+    public function UpdateUser(array $data) : int
+    {
+        $row = $this->update(Session::userId(), $data);
+        return $row;
+    }
+
+       public function deleteUser() : int
+    {
+        $row = $this->delete(Session::userId());
+        return $row;
     }
 }

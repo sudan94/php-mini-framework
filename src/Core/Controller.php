@@ -6,6 +6,7 @@ use PDO;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
+use Respect\Validation\Exceptions\NestedValidationException;
 
 abstract class Controller
 {
@@ -60,5 +61,16 @@ abstract class Controller
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
         return $_SESSION['csrf_token'];
+    }
+
+    public function getValidationErrors(NestedValidationException $e): array
+    {
+        $errors = [];
+        foreach ($e as $exception) {
+            if ($exception->getParam('name')) {
+                $errors[$exception->getParam('name')] = $exception->getMessage();
+            }
+        }
+        return $errors;
     }
 }

@@ -1,0 +1,37 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Home - Technical Challenge
+{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-6 offset-3">
+			<div class="card">
+				<div class="card-body">
+					<form action="/users/update" method="post" novalidate>
+						<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+						<div class="mb-3">
+							<label for="name" class="form-label">Name</label>
+							<input type="name" class="form-control {{ errors.name ? 'is-invalid' : '' }}" id="name" name="name" value="{{ old.name ?? user.user_name }}" required>
+							{% if errors.name %}
+								<div class="invalid-feedback">{{ errors.name }}</div>
+							{% endif %}
+						</div>
+						<div class="mb-3">
+							<label for="email" class="form-label">Email address</label>
+							<input type="email" class="form-control {{ errors.email ? 'is-invalid' : '' }}" id="email" name="email" value="{{ old.email ?? user.user_email }}" required>
+							{% if errors.email %}
+								<div class="invalid-feedback">{{ errors.email }}</div>
+							{% endif %}
+						</div>
+
+						<div class="justify-content-md-center d-flex">
+							<button type="submit" class="btn btn-primary w-30">Save Changes</button>
+							<a href="/users/profile" class="btn btn-secondary w-30 ms-2">Cancel</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endblock %}

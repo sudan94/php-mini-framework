@@ -4,7 +4,7 @@ namespace App\Core;
 
 class Session
 {
-    // Lifetime of session in seconds (e.g., 30 minutes)
+    // Lifetime of session in seconds 30 minutes
     private const TIMEOUT = 1800;
 
     public static function start(): void
@@ -16,7 +16,6 @@ class Session
             session_start();
         }
 
-        // Check for timeout
         if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > self::TIMEOUT)) {
             self::destroy();
             self::start(); // restart clean session
@@ -74,12 +73,12 @@ class Session
         return self::has('user_id');
     }
 
-    public static function login(int $userId, string $email): void
+    public static function login(int $userId, string $email, string $name): void
     {
         self::regenerate();
         self::set('user_id', $userId);
         self::set('user_email', $email);
-
+        self::set('user_name', $name);
     }
 
     public static function logout(): void
@@ -87,8 +86,18 @@ class Session
         self::destroy();
     }
 
+    public static function user(): ?array
+    {
+        return array("user_id" => $_SESSION['user_id'], "user_email" => $_SESSION["user_email"], "user_name" => $_SESSION["user_name"]);
+    }
     public static function userId(): ?int
     {
-        return $_SESSION['user_id'] ?? null;
+        return $_SESSION['user_id'];
+    }
+
+    public static function setUserUpdates(string $email, string $name): void
+    {
+        self::set('user_email', $email);
+        self::set('user_name', $name);
     }
 }

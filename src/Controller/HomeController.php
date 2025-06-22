@@ -12,7 +12,7 @@ class HomeController extends Controller {
     }
 
     public function index() : void {
-         echo $this->render('users/index.twig', [
+         echo $this->render('home/index.twig', [
             'title' => 'Welcome to the Technical Challenge',
             'session' => $_SESSION
         ]);
