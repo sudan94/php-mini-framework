@@ -42,7 +42,8 @@ class AuthController extends Controller
         try {
             $validator->assert($data);
         } catch (\Respect\Validation\Exceptions\ValidationException $e) {
-            return;
+             Session::set('error', 'Invalid credentials');
+            $this->redirect("/login");
         }
 
         if ($this->verifyPassword($data['email'], $data['password'])) {
