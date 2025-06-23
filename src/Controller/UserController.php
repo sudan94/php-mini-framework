@@ -65,6 +65,7 @@ class UserController extends Controller
         if ($row) {
             Session::set('success', 'User data updated sucessfully');
             Session::setUserUpdates($data["email"], $data["name"]);
+            $this->dbLogger->log("INFO", "User updated profile with ID: " . Session::userId());
             $this->redirect("/users/profile");
         } else {
             echo $this->render('users/editProfile.twig', [
@@ -80,6 +81,7 @@ class UserController extends Controller
         $row = $this->userModel->deleteUser();
         if ($row) {
             Session::set('success', 'User removed sucessfully');
+            $this->fileLogger->log("INFO", "User deleted with ID: " . Session::userId());
             Session::logout();
             $this->redirect("/register");
         } else {

@@ -16,7 +16,7 @@ class DatabaseLogger extends Logger
 
     public function log(string $level, string $message): void
     {
-        $stmt = $this->db->prepare("INSER INTO logs (level, message, created_at) VALUES (:level, :message, :created_at)");
+        $stmt = $this->db->prepare("INSERT INTO logs (level, message, created_at) VALUES (:level, :message, :created_at)");
         $stmt->execute([
             'level' => $level,
             'message' => $message,
